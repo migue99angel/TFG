@@ -1,0 +1,7 @@
+\chapter{Antecedentes}
+
+Si bien es cierto que la implementación eficiente del cálculo de la dimensión fractal ha sido objeto de estudio por varios autores, en ellos se les da un enfoque a otros tipos de conjuntos de datos.\\ En \cite{JIMENEZ20121229} se utiliza una librería incluida en Microsoft Visual Studio para la implementación de una versión multihilo y CUDA para una implementación utilizando la tarjeta gráfica, sin embargo, el algoritmo es aplicado a imágenes(2D) y modelos(3D) en los que los píxeles toman diversos valores, pudiendo ser blanco, negro o alguna tonalidad concreta de gris. En el citado estudio llegan a obtener aceleraciones de hasta 28x con respecto a la versión secuencial. 
+\\
+En \cite{10.1007/978-3-030-64616-5_8} realizan un enfoque muy parecido al utilizado en este estudio para estudiar un problema un poco distinto, utilizan OpenMP y CUDA para realizar el cálculo de la dimensión fractal sobre curvas definidas analíticamente, llegando a obtener acelereaciones de hasta 58x gracias al uso de la tarjeta gráfica.
+\\
+Finalmente, \cite{de2020fast} utiliza la misma metodología que se va a utilizar en este trabajo para el estudio de un algoritmo de Box counting diferencial, utilizando OpenACC para el desarrollo de una versión capaz de aprovechar los múltiples núcleos del microprocesador, con la que obtiene aceleraciones de hasta 6x. Y usando CUDA para la implementación de una versión para la GPU, con la que obtiene aceleraciones de hasta 52x con respecto a la versión secuencial.

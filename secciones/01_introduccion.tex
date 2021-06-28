@@ -1,0 +1,8 @@
+\chapter{Introducción}
+
+
+El cálculo de la dimensión fractal de un conjunto de datos es una técnica con una gran multitud de aplicaciones, desde el ámbito económico, -- incluyendo su relación con la premisa del Bitcoin --  {\cite{delfin2016fractal}}, hasta el campo de la medicina y estudio del cuerpo humano, siendo este cálculo útil en la detección de tumores cerebrales {\cite{iftekharuddin2009fractal}}.
+
+La dimensión fractal tiene su cabida en la neurociencia, siendo útil para el procesamiento de la actividad cerebral con el fin de poder estudiar diversas patologías neurodegenerativas \cite{fernandez2001use}. Sin embargo las técnicas actuales para la adquisición de este tipo de datos tales como las electroencefalografías o las resonancias magnéticas, generan grandes volúmenes de datos que implican un alto coste computacional, ya que en función de la dimensión del conjunto de datos, el orden del algoritmo aumenta de manera exponencial, siendo O(n) para conjuntos de datos de una dimensión y O($n^{4}$)  para matrices de cuatro dimensiones.
+
+El propósito de este proyecto es el de la implementación eficiente del algoritmo conocido como Box counting. Para ello, partiendo del algoritmo, inicialmente escrito en el lenguaje de programación Matlab se desarrolla una versión secuencial, escrita en C++ que sirve como base para utilizar diversas tecnologías,como OpenACC y CUDA, con el fin de aprovechar el paralelismo que proporcionan los microprocesadores actuales así como la arquitectura SIMD (\textit{Single Instruction Multiple Data}) presente en las tarjetas gráficas.
