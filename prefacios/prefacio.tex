@@ -14,22 +14,24 @@ Miguel Ángel Posadas Arráez\\
 \vspace{0.7cm}
 
 \noindent{\textbf{Resumen}\\
-El procesamiento de datos es una parte esencial en el estudio de diversas enfermedades neurodegenerativas. No obstante, las técnicas actuales para la adquisión (resonancia magnética, encefalografía etc...) generan grandes volumenes de datos, lo que conlleva que su procesamiento tenga un gran coste computacional. El propósito de este trabajo es la programación eficiente del método conocido como Box counting para el procesamiento de matrices binarias.  Para la toma de tiempos y con el objetivo de poder hacer diversas comparaciones hemos utilizado dos plataformas con software y hardware diferentes. En un principio, el algoritmo venía programado en Matlab, con el objetivo de obtener una versión más eficiente de este algoritmo implementé una versión secuencial en C++ y posteriormente traté de aprovechar el paralelismo dado por los procesadores multi-core introduciendo la tecnología OpenACC obteniendo aceleraciones de hasta 15.7x. Finalmente, para la obtención de mejores aceleraciones, utilizamos el paradigma de computación de propósito general en unidades de procesamiento gráfico (GPGPU) para aprovechar la arquitectura \textit{Single Instruction, Multiple Data} (SIMD) con el que obtenimos aceleraciones de hasta 38.48x .
+El procesamiento de datos es una parte esencial en el estudio de diversas enfermedades neurodegenerativas. No obstante, las técnicas actuales para la adquisión de estos datos(resonancia magnética, encefalografía etc...) generan grandes volumenes de datos, lo que conlleva que su procesamiento tenga un gran coste computacional. El propósito de este trabajo es la programación eficiente del método conocido como Box counting para el procesamiento de matrices binarias.  Para la toma de tiempos y con el objetivo de poder hacer diversas comparaciones hemos utilizado dos plataformas con software y hardware diferentes. En un principio, el algoritmo venía programado en Matlab, con el objetivo de obtener una versión más eficiente de este algoritmo implementé una versión secuencial en C++ y posteriormente traté de aprovechar el paralelismo dado por los procesadores multi-core introduciendo la tecnología OpenACC obteniendo aceleraciones de hasta 15.7x. Finalmente, para la obtención de mejores aceleraciones, utilizamos el paradigma de computación de propósito general en unidades de procesamiento gráfico (GPGPU) para aprovechar la arquitectura \textit{Single Instruction, Multiple Data} (SIMD) con el que obtenimos aceleraciones de hasta 77.47x .
 	
 
 \cleardoublepage
 
 \begin{center}
-	{\large\bfseries Same, but in English}\\
+	{\large\bfseries Efficient programming of a cerebral processing activity algorithm \\ Implemantation and optimization with parallelization of a binary matrixes fractal analysis algorithm }\\
 \end{center}
 \begin{center}
 	Miguel Ángel Posadas Arráez\\
 \end{center}
 \vspace{0.5cm}
-\noindent{\textbf{Keywords}: \textit{open source}, \textit{floss}
+\noindent{\textbf{Keywords}: \textit{Box counting, Fractal dimension of binary matrix, parallel programming, GPU programming}
 \vspace{0.7cm}
 
 \noindent{\textbf{Abstract}\\
+Data processing is essential in neurodegenerative diseases studies. However, the existing ways of getting this data (magnetic resonance, electro-encephalography ... ) generate big data volumes, so processing that data has a expensive computing cost. The purpose of this paper is the efficient programming of the Box counting method in order to apply it at binary matrixes processing. They have been used two differents hardware and software platforms to track the time and making comparisons between then. At first, the algorithm was write on Matlab. I \textit{"translated"} that code to C++ with the goal of getting a more efficient sequential algorithm. Then, I tried to parallelize it with OpenACC with the goal of using the multicore CPU and I get a 15.7x speedup. Finally, in order to get the best speedup, I used the general-purpose computing on graphics processing units (GPGPU) to take advantage of the \textit{Single Instruction, Multiple Data} (SIMD) architecture on the graphics processing unit (GPU), getting a speedup of 77.47x.
+
 
 
 \cleardoublepage
@@ -38,7 +40,7 @@ El procesamiento de datos es una parte esencial en el estudio de diversas enferm
 
 \noindent\rule[-1ex]{\textwidth}{2pt}\\[4.5ex]
 
-D. \textbf{Tutora/e(s)}, Profesor(a) del ...
+D. \textbf{Juan Ruiz de Miras}, Profesor del Departamento de Lenguajes y Sistemas Informáticos
 
 \vspace{0.5cm}
 
@@ -46,13 +48,13 @@ D. \textbf{Tutora/e(s)}, Profesor(a) del ...
 
 \vspace{0.5cm}
 
-Que el presente trabajo, titulado \textit{\textbf{Chief}},
-ha sido realizado bajo mi supervisión por \textbf{Estudiante}, y autorizo la defensa de dicho trabajo ante el tribunal
+Que el presente trabajo, titulado \textit{\textbf{Programación eficiente de un algoritmo de procesamiento de la actividad cerebral}},
+ha sido realizado bajo mi supervisión por \textbf{Miguel Ángel Posadas Arráez}, y autorizo la defensa de dicho trabajo ante el tribunal
 que corresponda.
 
 \vspace{0.5cm}
 
-Y para que conste, expiden y firman el presente informe en Granada a Junio de 2018.
+Y para que conste, expiden y firman el presente informe en Granada a Julio de 2021.
 
 \vspace{1cm}
 
@@ -60,7 +62,7 @@ Y para que conste, expiden y firman el presente informe en Granada a Junio de 20
 
 \vspace{5cm}
 
-\noindent \textbf{(nombre completo tutor/a/es)}
+\noindent \textbf{Juan Ruiz de Miras}
 
 \chapter*{Agradecimientos}
 
