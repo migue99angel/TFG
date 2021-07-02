@@ -1,7 +1,7 @@
 \thispagestyle{empty}
 
 \begin{center}
-{\large\bfseries Programación eficiente de un algoritmo de procesamiento de la actividad cerebral \\ Implementación y optimización mediante paralelización de un algoritmo de análisis fractal de matrices binarias }\\
+{\large\bfseries Programación eficiente de un algoritmo de procesamiento de la actividad cerebral}\\
 \end{center}
 \begin{center}
 Miguel Ángel Posadas Arráez\\
@@ -10,23 +10,23 @@ Miguel Ángel Posadas Arráez\\
 %\vspace{0.7cm}
 
 \vspace{0.5cm}
-\noindent{\textbf{Palabras clave}: \textit{Box counting, análisis fractal de matrices binarias, programación paralela, programación GPU}
+\noindent{\textbf{Palabras clave}: \textit{Box counting, OpenACC, CUDA, programación paralela, programación GPU}
 \vspace{0.7cm}
 
 \noindent{\textbf{Resumen}\\
-El procesamiento de datos es una parte esencial en el estudio de diversas enfermedades neurodegenerativas. No obstante, las técnicas actuales para la adquisión de estos datos(resonancia magnética, encefalografía etc...) generan grandes volumenes de datos, lo que conlleva que su procesamiento tenga un gran coste computacional. El propósito de este trabajo es la programación eficiente del método conocido como Box counting para el procesamiento de matrices binarias.  Para la toma de tiempos y con el objetivo de poder hacer diversas comparaciones hemos utilizado dos plataformas con software y hardware diferentes. En un principio, el algoritmo venía programado en Matlab, con el objetivo de obtener una versión más eficiente de este algoritmo implementé una versión secuencial en C++ y posteriormente traté de aprovechar el paralelismo dado por los procesadores multi-core introduciendo la tecnología OpenACC obteniendo aceleraciones de hasta 15.7x. Finalmente, para la obtención de mejores aceleraciones, utilizamos el paradigma de computación de propósito general en unidades de procesamiento gráfico (GPGPU) para aprovechar la arquitectura \textit{Single Instruction, Multiple Data} (SIMD) con el que obtenimos aceleraciones de hasta 77.47x .
+El procesamiento de datos es una parte esencial en el estudio de diversas enfermedades neurodegenerativas. No obstante, las técnicas actuales para la adquisión de estos datos (resonancia magnética, encefalografía etc...) generan grandes volúmenes de datos, lo que conlleva que su procesamiento tenga un gran coste computacional. El propósito de este trabajo es la programación eficiente del método conocido como Box counting para el procesamiento de matrices binarias.  Para la toma de tiempos y con el objetivo de poder hacer diversas comparaciones hemos utilizado dos plataformas con software y hardware diferentes. En un principio, el algoritmo venía programado en Matlab, con el objetivo de obtener una versión más eficiente de este algoritmo implementamos una versión secuencial en C++ y posteriormente tratamos de aprovechar el paralelismo dado por los procesadores multi-core introduciendo la tecnología OpenACC, obteniendo aceleraciones de hasta 4.97x en el primer equipo, con prestaciones limitadas, y aceleraciones de 15.7x con el segundo equipo, de prestaciones considerablemente superiores. Finalmente, para la obtención de mejores aceleraciones, utilizamos el paradigma de computación de propósito general en unidades de procesamiento gráfico (GPGPU) para aprovechar la arquitectura \textit{Single Instruction, Multiple Data} (SIMD) con el que obtuvimos aceleraciones de hasta 10.06x con respecto a la versión secuencial en el primer equipo, y aceleraciones de 77.47x en el segundo equipo.
 	
 
 \cleardoublepage
 
 \begin{center}
-	{\large\bfseries Efficient programming of a cerebral processing activity algorithm \\ Implemantation and optimization with parallelization of a binary matrixes fractal analysis algorithm }\\
+	{\large\bfseries Efficient programming of a cerebral processing activity algorithm}\\
 \end{center}
 \begin{center}
 	Miguel Ángel Posadas Arráez\\
 \end{center}
 \vspace{0.5cm}
-\noindent{\textbf{Keywords}: \textit{Box counting, Fractal dimension of binary matrix, parallel programming, GPU programming}
+\noindent{\textbf{Keywords}: \textit{Box counting, OpenACC, CUDA, parallel programming, GPU programming}
 \vspace{0.7cm}
 
 \noindent{\textbf{Abstract}\\

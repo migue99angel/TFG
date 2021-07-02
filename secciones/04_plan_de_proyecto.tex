@@ -1,16 +1,16 @@
 \chapter{Plan de proyecto}
 
-En este apartado se presenta la planificación seguida a lo largo de todo el proyecto. Se especifican una serie de tareas diferenciadas entre sí que a continuación serán detalladas en profundidad.\\ Para dar por finalizada una tarea, y así poder pasar a la siguiente, esta ha debido ser revisada previamente por el tutor. \\ Dentro del plan de estudios de la titulación, el trabajo de fin de grado tiene un peso de 12 créditos ECTS, y teniendo en cuenta que cada crédito ECTS equivale a 25 horas obtenemos que el proyecto debe ser completado en 300 horas. De esta manera la planificación que procederemos a desarrollar en esta sección, se elabora considerando que el horario va a ser de lunes a viernes con jornadas de 3 horas de trabajo.\\
+En este apartado se presenta la planificación seguida a lo largo de todo el proyecto. Se especifican una serie de tareas diferenciadas entre sí que a continuación serán detalladas en profundidad.\\ Para dar por finalizada una tarea, y así poder pasar a la siguiente, ésta ha debido ser revisada previamente por el tutor. \\ Dentro del plan de estudios de la titulación, el trabajo de fin de grado tiene una carga de 12 créditos ECTS, y teniendo en cuenta que cada crédito ECTS equivale a 25 horas obtenemos, que el proyecto debe ser completado en 300 horas. De esta manera la planificación que procederemos a desarrollar en esta sección, se elabora considerando que el horario va a ser de lunes a viernes con jornadas de 3 horas de trabajo.\\
 
 \section{Descripción de las tareas}
 \subsection{Planificación del proyecto}
 \label{tareaPlanificacion}
-La planificación del proyecto corresponde a la primera tarea. Se subdivide el proyecto en las propias tareas que se están comentando en este punto, se realiza una estimación de tiempo y se genera un diagrama de Gantt que se puede consultar en la Figura \ref{fig:Gantt}.\\
+La planificación del proyecto corresponde a la primera tarea. Se subdivide el proyecto en las propias tareas que se están comentando en este punto, se realiza una estimación de tiempo de la que se genera un diagrama de Gantt que se puede consultar en la Figura \ref{fig:Gantt}, y una estimación de costos, que queda reflejada en la sección \ref{Costos}.\\
 
 Se estima que esta tarea tendrá una duración de 5 horas.
 
 \subsection{Estudio del algoritmo Box counting}
-Con esta tarea se deja un tiempo para obtener formación sobre el algoritmo Box counting, conocer como funciona el \textit{"Fixed grid scan"}, y entender la implementación inicial escrita en Matlab. Para la realización de esta tarea se requiere de la adquisición de unas nociones básicas de Matlab debido al desconocimiento previo del lenguaje.\\
+Con esta tarea se deja un tiempo para obtener formación sobre el algoritmo Box counting, conocer cómo funciona el \textit{"Fixed grid scan"}, y entender la implementación inicial escrita en Matlab. Para la realización de esta tarea se requiere de la adquisición de unas nociones básicas de Matlab debido al desconocimiento previo del lenguaje.\\
 
 Se estima que esta tarea tendrá una duración de 10 horas.
 
@@ -72,7 +72,7 @@ Como anticipábamos en \textit{"\nameref{tareaPlanificacion}"}, la primera etapa
 
 \begin{table}[H]
     \centering
-    \begin{adjustbox}{angle=90, max height=\textheight}
+    \begin{adjustbox}{max height=\textheight, max width=\textwidth}
     \begin{tabular}{|clllrrl|} 
     \hline
     \rowcolor{black} \multicolumn{1}{|l}{}  & \textcolor{white}{Tareas} & \textcolor{white}{Fecha de inicio}         & \textcolor{white}{Fecha de finalización} & \textcolor{white}{Horas estimadas}&\\                                      
@@ -116,70 +116,88 @@ Debido a que este proyecto corresponde al ámbito académico, se presta especial
 \begin{itemize}
     \item Como alternativa a Matlab, se utiliza Octave. \cite{unknown-author-2021B}.
     \item Como herramienta de control de versiones, se utiliza GitHub, siendo posible obtener una licencia de estudiante en la siguiente referencia \cite{unknown-author-2021}.
-    \item Para la gestión del proyecto y la gestión de toda la documentación, se utiliza la suite ofimática de Google, accediendo siempre con la cuenta corporativa de la Universidad de Granada (dominio go.ugr.es).
+    \item Para la elaboración de hojas de cálculo y generación de gráficos, se utiliza la suite ofimática de Google, accediendo siempre con la cuenta corporativa de la Universidad de Granada (dominio go.ugr.es).
+    \item Para la elaboración de la memoria LaTeX como procesador de textos. \cite{unknown-author-no-dateD}.
     \item Para la paralelización mediante el uso de tarjeta gráfica, se utiliza el CUDA Toolkit, \cite{unknown-author-no-date}.
     \item Para la paralelización mediante el uso de los mútliples núcleos de la CPU, se utiliza OpenACC. \cite{unknown-author-no-dateB}.
+    \item El sistema operativo del equipo principal utilizado para el desarrollo del proyecto es Ubuntu 20.04.2 LTS. \cite{unknown-author-no-dateE}.
 \end{itemize}
 
 \subsection{Recursos Hardware}
 \label{RecursosHardware}
-Para el desarrollo del proyecto se utiliza un ordenador portátil, que cuenta con las siguientes características:
+Para el desarrollo del proyecto se utilizan dos equipos, un ordenador portatil y un servidor. En la tabla \ref{fig:Hardware} quedan reflejadas las características más importantes de los distintos equipos.
 
-\begin{itemize}
-    \item Sistema Operativo: Ubuntu 20.04.2 LTS
-    \item CPU: Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz
-    \item GPU: Nvidia GeForce GTX 1050 Mobile
-    \item Memoria RAM: 12 GB DDR4
-    \item Almacenamiento secundario:
-    \begin{itemize}
-        \item SSD NVMe LITEON CA1-8D128-HP 128GB
-        \item SSD Samsung SSD 860 QVO 1TB
-    \end{itemize} 
-\end{itemize}
-
-Con el objetivo de dejar más información sobre la plataforma en la que se desarrolla el proyecto, se deja la Figura \ref{fig:CPU} con la salida de la ejecución del comando lscpu, y la Figura \ref{fig:GPU} con la salida del comando pgaccelinfo.
-
-\begin{figure}[H]
+\begin{table}[H]
     \centering
-    \includegraphics[width=\textwidth]{img/lscpu.jpeg}
-    \caption{Salida comando lscpu}
-    \label{fig:CPU}
-\end{figure}
+    \begin{adjustbox}{max height=\textheight,max width=\textwidth}
+    \begin{tabular}{|clllrrl|} 
+    \hline
+    \rowcolor{black} \multicolumn{1}{|l}{}   & \textcolor{white}{Plataforma}         & \textcolor{white}{} \\  
+    \hline
+    \rowcolor{white} \multicolumn{1}{|l}{Plataforma}   & \textcolor{black}{PC}         & \textcolor{black}{Servidor} \\  
+    \hline
+    \rowcolor{white} \multicolumn{1}{|l}{Sistema Operativo}    & \textcolor{black}{Ubuntu 20.04 LTS $x86-64$}         & \textcolor{black}{Debian Linux 5.8.10-1 $x86-64$}        \\                                                            
+    \hline
+    \midrule
+    \hline
+    \rowcolor{black} \multicolumn{1}{|l}{}   & \textcolor{white}{CPU}         & \textcolor{white}{} \\  
+    \hline
+    \rowcolor{white} \multicolumn{1}{|l}{Model}    & \textcolor{black}{Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz}         & \textcolor{black}{2 x Intel(R) Xeon(R) Silver 4210 CPU @ 2.20GHz}        \\ 
+    \hline
+    \rowcolor{white} \multicolumn{1}{|l}{Cores-thread}    & \textcolor{black}{4-8}         & \textcolor{black}{20-40}        \\  
+    \hline
+    \rowcolor{white} \multicolumn{1}{|l}{RAM}    & \textcolor{black}{12 GB}         & \textcolor{black}{96 GB}        \\ 
+    \hline
+    \rowcolor{black} \multicolumn{1}{|l}{}   & \textcolor{white}{GPU}         & \textcolor{white}{} \\  
+    \hline                          
+    \rowcolor{white} \multicolumn{1}{|l}{Model}    & \textcolor{black}{GeForce GTX 1050 Mobile}         & \textcolor{black}{GeForce RTX 3090}        \\ 
+    \hline
+    \rowcolor{white} \multicolumn{1}{|l}{Computing Capability}   & \textcolor{black}{6.1}         & \textcolor{black}{8.0} \\  
+    \hline
+    \rowcolor{white} \multicolumn{1}{|l}{Arquitectura}   & \textcolor{black}{Pascal}         & \textcolor{black}{Ampere} \\  
+    \hline 
+    \rowcolor{white} \multicolumn{1}{|l}{MPs}   & \textcolor{black}{5}         & \textcolor{black}{82} \\  
+    \hline 
+    \rowcolor{white} \multicolumn{1}{|l}{SPs}   & \textcolor{black}{640}         & \textcolor{black}{10496} \\  
+    \hline  
+    \rowcolor{white} \multicolumn{1}{|l}{Memoria Global}   & \textcolor{black}{2 GB}         & \textcolor{black}{24 GB} \\  
+    \hline  
+    \rowcolor{white} \multicolumn{1}{|l}{Tamaño de Warp}   & \textcolor{black}{32}         & \textcolor{black}{32} \\  
+    \hline  
+    \rowcolor{white} \multicolumn{1}{|l}{Nº Máximo de hebras por bloque}   & \textcolor{black}{1024}         & \textcolor{black}{1024} \\  
+    \hline  
+    \rowcolor{white} \multicolumn{1}{|l}{Nº Máximo de hebras por SMP}   & \textcolor{black}{2048}         & \textcolor{black}{1536} \\  
+    \hline  
+    \rowcolor{white} \multicolumn{1}{|l}{Tamaño de caché L2}   & \textcolor{black}{524288 B}         & \textcolor{black}{6291456 B} \\  
+    \hline  
+    \rowcolor{white} \multicolumn{1}{|l}{Memoria compartida por bloque}   & \textcolor{black}{49152 B}         & \textcolor{black}{49152 B} \\  
+    \hline  
+    \rowcolor{white} \multicolumn{1}{|l}{Registros por bloque}   & \textcolor{black}{65536}         & \textcolor{black}{65536} \\  
+    \hline  
+    \rowcolor{white} \multicolumn{1}{|l}{ECC}   & \textcolor{black}{Desactivado}         & \textcolor{black}{Desactivado} \\  
+    \hline  
+    \rowcolor{white} \multicolumn{1}{|l}{Consumo energético}   & \textcolor{black}{75 W}         & \textcolor{black}{350 W} \\  
+    \hline    
+    \end{tabular}
+    \end{adjustbox}
+    \caption{Tabla comparativa de las plataformas hardware y software utilizadas para las medidas de tiempos}
+    \label{fig:Hardware}
+\end{table}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{img/pgaccelinfo.jpeg}
-    \caption{Salida comando pgaccelinfo}
-    \label{fig:GPU}
-\end{figure}
 
-Este equipo fue comprado hace 4 años con fines académicos por un coste inicial de 1100€, por tanto cada curso académico tiene un coste de 275€. Como este proyecto está enmarcado en un cuatrimestre, se estima que el coste de amortización del equipo es de 137.5€.\\
 
-Como ya se comenta más adelante, el código desarrollado será ejecutado en dos plataformas distintas, con el objetivo de poder tener dos medidas distintas con las que comparar. Las características de esta segunda máquina son las que se pueden consultar en las Figuras \ref{fig:CPUServer} y \ref{fig:GPUServer}:
+El primer equipo (Identificado como PC en la Tabla \ref{fig:Hardware}) tuvo un coste inicial de 1100€, basándonos en \cite{unknown-author-no-dateG}, tiene un periodo de amortización de 6 años, luego cada año tiene un coste de 183.33€. Como este proyecto está enmarcado en un cuatrimestre, se estima que el coste de amortización del equipo es de 45.83€.\\
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{img/lscpuServer.jpeg}
-    \caption{Salida comando lscpu para el servidor de la Universidad}
-    \label{fig:CPUServer}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{img/pgaccelinfoServer.jpeg}
-    \caption{Salida comando pgaccelinfo para el servidor de la Universidad}
-    \label{fig:GPUServer}
-\end{figure}
-
-El servidor tiene un precio de 24000€, si establecemos un periodo de amortización aproximado de 6 años, obtenemos que el del servidor tiene un costo de 4000€/año, que resulta en 11€/día. Como se han requerido 7 días del servidor, concluimos que el costo total por este recurso ha sido de 77€.\\ 
+El servidor tiene un precio de 24000€, se establece un periodo de amortización de 6 años basándonos de nuevo en \cite{unknown-author-no-dateG}. Obtenemos que el del servidor tiene un costo de 4000€/año, que resulta en 11€/día. Como se han requerido 7 días del servidor, concluimos que el costo total por este recurso ha sido de 77€.\\ 
 
 \subsection{Organización del personal}
-Dentro del plan de estudios de la titulación \cite{unknown-author-no-dateC}, el Trabajo de Fin de Grado (TFG), tiene una dotación de 12 créditos ECTS. Sabiendo que cada crédito ECTS equivale a 25 horas, el proyecto debe ser planificado en un total de 300 horas.\\
+Dentro del plan de estudios de la titulación \cite{unknown-author-no-dateC}, el Trabajo de Fin de Grado (TFG), tiene una carga de 12 créditos ECTS. Sabiendo que cada crédito ECTS equivale a 25 horas, el proyecto debe ser planificado en un total de 300 horas.\\
 
 
 \subsection{Estimación de costos del proyecto}
+\label{Costos}
 
-Como ya se ha comentado previamente, el proyecto debe ser planificado en 300 horas, por tanto en este apartado se va a realizar un desglose de los gastos que conlleva el proyecto, especificando a que se dedicará cada hora. Para el cálculo del presupuesto se va a tomar como salario promedio 8.22 €/hora que es lo encontrado en \cite{unknown-author-2021C}.\\ En la Tabla \ref{fig:CosteTareas} se puede consultar el desglose de los gastos de cada tarea.
+Como ya se ha comentado previamente, el proyecto debe ser planificado en 300 horas, por tanto en este apartado se va a realizar un desglose de los gastos que conlleva el proyecto, especificando a que se dedicará cada hora. Para el cálculo del presupuesto se va a tomar como salario promedio 8.22 €/hora según lo especificado en \cite{unknown-author-2021C}.\\ En la Tabla \ref{fig:CosteTareas} se puede consultar el desglose de los gastos de cada tarea.
 
 \begin{table}[H]
     \centering
@@ -210,7 +228,7 @@ Como ya se ha comentado previamente, el proyecto debe ser planificado en 300 hor
     \hline
     \rowcolor{white} \multicolumn{1}{|l}{}  & \textcolor{black}{Preparación de la defensa ante el tribubal} & \textcolor{black}{10 h}         & \textcolor{black}{82.2€} &\\                                  
     \hline
-    \rowcolor{white} \multicolumn{1}{|l}{}  & \textcolor{black}{Total} & \textcolor{black}{}         & \textcolor{black}{2466€} &\\                                  
+    \rowcolor{white} \multicolumn{1}{|l}{}  & \textcolor{black}{Total} & \textcolor{black}{300h}         & \textcolor{black}{2466€} &\\                                  
     \hline
     \end{tabular}
     \end{adjustbox}
@@ -233,11 +251,11 @@ En la Tabla \ref{fig:CosteRecursos} se especifican todos los recursos necesarios
     \hline
     \rowcolor{white} \multicolumn{1}{|l}{}  & \textcolor{black}{Recursos Software} & \textcolor{black}{0 €}         & \textcolor{black}{Ver \textit{\nameref{RecursosSoftware}}} &\\
     \hline
-    \rowcolor{white} \multicolumn{1}{|l}{}  & \textcolor{black}{Amortización del equipo personal} & \textcolor{black}{137.5 €}         & \textcolor{black}{Coste de amortización del equipo detallado en \textit{\nameref{RecursosHardware}}} &\\
+    \rowcolor{white} \multicolumn{1}{|l}{}  & \textcolor{black}{Amortización del equipo personal} & \textcolor{black}{45.83 €}         & \textcolor{black}{Coste de amortización del equipo detallado en \textit{\nameref{RecursosHardware}}} &\\
     \hline
     \rowcolor{white} \multicolumn{1}{|l}{}  & \textcolor{black}{Amortización del servidor} & \textcolor{black}{77 €}         & \textcolor{black}{Coste de amortización del servidor detallado en \textit{\nameref{RecursosHardware}}} &\\
     \hline
-    \rowcolor{white} \multicolumn{1}{|l}{}  & \textcolor{black}{Total} & \textcolor{black}{2770.5 €}         & \textcolor{black}{} &\\
+    \rowcolor{white} \multicolumn{1}{|l}{}  & \textcolor{black}{Total} & \textcolor{black}{2678.83 €}         & \textcolor{black}{} &\\
     \hline
     \end{tabular}
     \end{adjustbox}
