@@ -63,13 +63,16 @@ Se estima que esta tarea tendrá una duración de 10 horas.
 \section{Diagrama de Gantt}
 Como anticipábamos en \textit{"\nameref{tareaPlanificacion}"}, la primera etapa del proyecto es la planificación temporal del mismo. Para ello el primer paso es la división del proyecto en tareas y su correspondiente especificación. A continuación, se realiza una estimación de los días necesarios que tomará cada tarea, teniendo en cuenta que se trabajará en jornadas de 3 horas diarias de lunes a viernes. Finalmente, se hace una planificación temporal de todas las tareas en base a la estimación de tiempo realizada, obteniendo así el diagrama de la Figura \ref{fig:Gantt}. En la tabla \ref{fig:Planificacion} se puede consultar la estimación de cada tarea así como, su fecha de inicio y finalización\\ Debido a la falta de experiencia en un proyecto de este tipo, esta especificación puede que no sea suficientemente detallada, en los siguientes capítulos se profundizará más en la descripción de las distintas tareas.\\ Esto es una planificación inicial del proyecto, como en todo proyecto es posible que surjan inconvenientes que retrasen alguna de las tareas o que se hayan subestimado alguna de ellas.
 \newpage
+\begin{landscape}
+
+
 \begin{figure}[h]
     \raggedleft
-    \includegraphics[scale=0.145]{img/Diagrama de Gantt2.png}
+    \includegraphics[angle=-90,scale=0.145]{img/Diagrama de Gantt2.png}
     \caption{Diagrama de Gantt}
     \label{fig:Gantt}
 \end{figure}
-
+\end{landscape}
 \begin{table}[H]
     \centering
     \begin{adjustbox}{max height=\textheight, max width=\textwidth}
@@ -118,9 +121,10 @@ Debido a que este proyecto corresponde al ámbito académico, se presta especial
     \item Como herramienta de control de versiones, se utiliza GitHub, siendo posible obtener una licencia de estudiante en la siguiente referencia \cite{unknown-author-2021}.
     \item Para la elaboración de hojas de cálculo y generación de gráficos, se utiliza la suite ofimática de Google, accediendo siempre con la cuenta corporativa de la Universidad de Granada (dominio go.ugr.es).
     \item Para la elaboración de la memoria LaTeX como procesador de textos. \cite{unknown-author-no-dateD}.
-    \item Para la paralelización mediante el uso de tarjeta gráfica, se utiliza el CUDA Toolkit, \cite{unknown-author-no-date}.
+    \item Para la paralelización mediante el uso de tarjeta gráfica, se utiliza el CUDA Toolkit, \cite{unknown-author-2021F}.
     \item Para la paralelización mediante el uso de los mútliples núcleos de la CPU, se utiliza OpenACC. \cite{unknown-author-no-dateB}.
     \item El sistema operativo del equipo principal utilizado para el desarrollo del proyecto es Ubuntu 20.04.2 LTS. \cite{unknown-author-no-dateE}.
+    \item Como herramienta de profiling para la versión secuencial se utiliza gprof \cite{unknown-author-no-dateI}.
 \end{itemize}
 
 \subsection{Recursos Hardware}

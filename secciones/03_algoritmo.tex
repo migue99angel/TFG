@@ -25,7 +25,7 @@ En las Figuras \ref{fig:basico1} y \ref{fig:basico2} , se aprecia el análisis m
     \centering
     \includegraphics[width=.24\textwidth]{img/basico1.png}
     \includegraphics[width=.24\textwidth]{img/basico2.png}
-    \caption{Iteraciones con r = 1 (Izquierda) y r = 2 (Derecha)}
+    \caption{Simplificación algoritmo con r = 1 (Izquierda) y r = 2 (Derecha)}
     \label{fig:basico1}
 \end{figure}
 
@@ -33,7 +33,7 @@ En las Figuras \ref{fig:basico1} y \ref{fig:basico2} , se aprecia el análisis m
     \centering
     \includegraphics[width=.24\textwidth]{img/basico3.png}
     \includegraphics[width=.24\textwidth]{img/basico4.png}
-    \caption{Iteraciones con r = 4 (Izquierda) y r = 8 (Derecha)}
+    \caption{Simplificación algoritmo con r = 4 (Izquierda) y r = 8 (Derecha)}
     \label{fig:basico2}
 \end{figure}
 
@@ -80,6 +80,7 @@ end
 \end{lstlisting}
 
 \section{Orden del algoritmo}
+\label{Orden}
 Para realizar un estudio del orden del algoritmo del Listing \ref{MatBox2D}, debemos diferenciar entre los bucles internos y el bucle  externo.\\
 
 Los bucles internos, en el peor de los casos, tienen que recorrer la estructura de datos al completo (en dos ocasiones, líneas 10-15 y línea 17 en Listing \ref{MatBox2D}). Por tanto, la expresión \ref{eficiencia_interna} (donde el 2 representa las dos operaciones elementales previas, el cálculo de la variable siz y siz2) caracteriza el tiempo de ejecución del interior del bucle externo, es decir, el contenido de las líneas 3 - 17 . Como la notación O trata de acotar superiormente, podemos concluir que dicha parte del algoritmo tiene un orden de O($n^2$).\\

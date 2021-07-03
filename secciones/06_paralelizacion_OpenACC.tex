@@ -1,0 +1,33 @@
+\chapter{Paralelización con OpenACC}
+
+En este capítulo se va a describir la paralelización realizada con la tecnología OpenACC introducida en la Sección \ref{OpenACC}, sobre el código secuencial desarrollado en el Capítulo \ref{Secuencial}.
+
+Si analizamos el Listing \ref{CppBox2D}, vemos que hay dos zonas de las que se puede aprovechar el paralelización. La primera zona es la que corresponde a las líneas 5-8, ya que distintas hebras pueden realizar el cómputo del box simultáneamente, sin interferirse entre ellas, ya que estamos usando el \textit{"fixed grid scans"}, es decir, que cada elemento de la matriz únicamente pertenece un a box. Para paralelizar esta parte con OpenACC es necesario utilizar las directivas necesarias para que las distintas hebras hebras se repartan las iteraciones de los bucles.
+
+La segunda zona en la que se puede extraer paralelismo, es en la zona en la que se acumulan la cantidad de cajas válidas, es decir, en las líneas 10-13. Pero es necesario apreciar un detalle, todas las hebras que se lancen van a actualizar la misma variable \textit{suma}, por lo que aparece lo que se conoce como \textbf{condición de carrera}. No todas las hebras finalizan su ejecución al mismo tiempo, y esto puede ocasionar que la variable \textit{suma} acabe con un resultado erróneo. Para solventar esta problemática, es necesario que establezcamos los mecanismos necesarios para que el acceso a la variable \textit{suma} (sección crítica) se realice bajo la condición de \textbf{exclusión mútua}. Por tanto para paralelizar esta zona con OpenACC será necesario no sólo las directivas necesarias para que se repartan las iteraciones de los bucles entre las distintas hebras, si no que establecer las directivas necesarias para que el cálculo de la variable \textit{suma} se haga correctamente.
+
+En el Listing \ref{ACCBox2D} se puede consultar la primera versión del Boxcount2D utilizando OpenACC. Finalmente, para solucionar el problema que sufre el cálculo de la variable \textit{suma}, se opta por la utilización de la cláusula \textit{reduce} que permite a cada hebra almacenar una copia privada de su variable \textit{suma}, para finalmente obtener el variable real mediante la acumulación de las variables privadas de cada hebra.
+
+
+\begin{lstlisting}[language=C++,caption={Primera versión del Boxcount2D paralelizado con OpenACC},label=ACCBox2D,basicstyle=\tiny]
+    for(auto g=p; g >= 0; g--)
+    {
+        int siz = pow(2,(p-g));
+        int siz2 = round(siz/2);
+        #pragma acc parallel loop 
+        for(auto i = 0; i <= (width-siz); i += siz)
+            for(auto j = 0; j <= (width-siz); j += siz)
+                matriz[i][j] = (matriz[i][j] || matriz[i+siz2][j] 
+                    || matriz[i][j+siz2] || matriz[i+siz2][j+siz2]);
+    
+        int suma = 0; 
+        #pragma acc parallel loop independent reduction(+:suma)
+        for(auto i = 0; i <= (width-siz); i += siz)
+            for(auto j = 0; j <= (width-siz); j += siz)
+                suma += matriz[i][j];
+    
+        n.push_back(suma);
+    }
+\end{lstlisting}
+
+Aunque la complejidad en el orden de los algoritmos para la versión 3D y 4D sea superior, la paralelización con OpenACC es idéntica para las versiones tridimensionales y cuatridimensionales, requeriendo estas del uso de las mismas directivas.

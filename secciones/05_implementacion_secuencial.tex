@@ -1,1 +1,95 @@
 \chapter{Implementación secuencial en C++}
+\label{Secuencial}
+Antes de utilizar las tecnologías introducidas en el Capítulo \ref{Tecnologias}, es necesario realizar una implementación en un lenguaje que permita el uso de dichas tecnologías. Para este proyecto se realiza una implementación en C++, y se modelan las estructuras de datos con vectores de la STL \cite{unknown-author-no-dateH}.
+
+Para esta implementación, se parte de un código inicial, \cite{unknown-author-2008}, modificado por el tutor del proyecto, el Profesor D. Juan Ruiz de Miras, para que el algoritmo sea capaz de analizar matrices en 4 dimensiones.
+
+
+
+En primer lugar se parte de la versión bidimensional, ya que es más sencilla y es más fácil detectar errores. La versión bidimensional en Matlab es la que se puede consultar en el Listing \ref{MatBox2D}. El equivalente programado en C++ se describe en el Listing \ref{CppBox2D}. Como variables de entrada en el código está \textbf{p} que representa el número de iteraciones necesarias para cubrir la matriz. \textbf{matriz} que es la estructura de datos y \textbf{n} que es la lista en la que se almacenará la cantidad de cajas válidas para cada tamaño de caja.
+\newpage
+\begin{lstlisting}[language=C++,caption={Primera versión del Boxcount2D programado en C++},label=CppBox2D,basicstyle=\tiny]
+for(auto g=p; g >= 0; g--)
+{
+    int siz = pow(2,(p-g));
+    int siz2 = round(siz/2);
+    for(auto i = 0; i <= (width-siz); i += siz)
+        for(auto j = 0; j <= (width-siz); j += siz)
+            matriz[i][j] = (matriz[i][j] || matriz[i+siz2][j] 
+                || matriz[i][j+siz2] || matriz[i+siz2][j+siz2]);
+
+    int suma = 0; 
+    for(auto i = 0; i <= (width-siz); i += siz)
+        for(auto j = 0; j <= (width-siz); j += siz)
+            suma += matriz[i][j];
+
+    n.push_back(suma);
+}
+\end{lstlisting}
+
+Como se anticipaba en la sección \ref{Orden}, la implementación de las versiones para matrices tridimensionales y cuatridimensionales son muy similares a la versión bidimensional, aunque aumentando la complejidad de la indexación de la estructura de datos. En el Listing \ref{CppBox3D} y \ref{CppBox4D} se aprecia dicho aumento de complejidad.
+
+\begin{lstlisting}[language=C++,caption={Primera versión del Boxcount3D programado en C++},label=CppBox3D,basicstyle=\tiny]
+for(auto g=p; g >= 0; g--)
+{
+    int siz = pow(2,(p-g));
+    int siz2 = round(siz/2);
+    for(auto i = 0; i <= (width-siz); i += siz)
+        for(auto j = 0; j <= (width-siz); j += siz)
+            for(auto k = 0; k <= (width-siz); k += siz)
+                matriz[i][j][k] = (matriz[i][j][k] || matriz[i+siz2][j][k] || matriz[i][j+siz2][k] 
+                                    || matriz[i+siz2][j+siz2][k] || matriz[i][j][k+siz2] 
+                                    || matriz[i+siz2][j][k+siz2] ||  matriz[i][j+siz2][k+siz2] 
+                                    || matriz[i+siz2][j+siz2][k+siz2]  );
+
+    int suma = 0; 
+    for(auto i = 0; i <= (width-siz); i += siz)
+        for(auto j = 0; j <= (width-siz); j += siz)
+            for(auto k = 0; k <= (width-siz); k += siz)
+                suma += matriz[i][j][k];
+
+    n.push_back(suma);
+}
+\end{lstlisting}
+
+\newpage
+\begin{lstlisting}[language=C++,caption={Primera versión del Boxcount4D programado en C++},label=CppBox4D,basicstyle=\tiny]
+for(auto g=p; g >= 0; g--)
+{
+    int siz = pow(2,(p-g));
+    int siz2 = round(siz/2);
+    for(auto i = 0; i <= (width-siz); i += siz)
+        for(auto j = 0; j <= (width-siz); j += siz)
+            for(auto k = 0; k <= (width-siz); k += siz)
+                for(auto l = 0; l <= (width-siz); l += siz)
+                    matriz[i][j][k][l] = (  matriz[i][j][k][l] 
+                                            || matriz[i+siz2][j][k][l] 
+                                            || matriz[i][j+siz2][k][l] 
+                                            || matriz[i+siz2][j+siz2][k][l] 
+                                            || matriz[i][j][k+siz2][l] 
+                                            || matriz[i+siz2][j][k+siz2][l] 
+                                            || matriz[i][j+siz2][k+siz2][l] 
+                                            || matriz[i+siz2][j+siz2][k+siz2][l] 
+                                            || matriz[i][j][k][l+siz2] 
+                                            || matriz[i+siz2][j][k][l+siz2] 
+                                            || matriz[i][j+siz2][k][l+siz2] 
+                                            || matriz[i+siz2][j+siz2][k][l+siz2] 
+                                            || matriz[i][j][k+siz2][l+siz2] 
+                                            || matriz[i+siz2][j][k+siz2][l+siz2] 
+                                            || matriz[i][j+siz2][k+siz2][l+siz2] 
+                                            || matriz[i+siz2][j+siz2][k+siz2][l+siz2] );
+
+    int suma = 0; 
+    for(auto i = 0; i <= (width-siz); i += siz)
+        for(auto j = 0; j <= (width-siz); j += siz)
+            for(auto k = 0; k <= (width-siz); k += siz)
+                for(auto l = 0; l <= (width-siz); l += siz)
+                    suma += matriz[i][j][k][l];
+
+    n.push_back(suma);
+}
+\end{lstlisting}
+
+Es necesario destacar que estas versiones no son las finales, son las que se utilizan como base para la implantación de las diferentes tecnologías. A lo largo de los siguientes capítulos se exponen diversas modificaciones que se realizan para optimizar el código, estas modificaciones también se aplican a la versión secuencial para que las comparaciones se hagan en igualdad de condiciones.
+
+Una vez implementada la versión secuencial, es importante saber en que zonas del código se consume más tiempo de ejecución. Para esto se ha utilizado una herramienta de profiling llamada \textit{gprof}, \cite{unknown-author-no-dateI}. Con esta herramienta se confirma lo que se sospechaba, la mayor parte del tiempo el código se ocupa en labores de gestión de memoria, tanto en el acceso mediante el operador [], como en la escritura del resultado de las operaciones OR. Esto es un factor a tener en cuenta ya que esas son las zonas que tenemos que tenemos que paralelizar. Los resultados de esta herramienta eran de esperar ya que las operaciones de Entrada/Salida son muy costosas.
