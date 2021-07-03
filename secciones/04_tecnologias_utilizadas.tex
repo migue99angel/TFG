@@ -1,0 +1,45 @@
+\chapter{Tecnologías utilizadas}
+Tras el estudio teórico del algoritmo a implementar, se deja este capítulo para la introducción y descripción de las tecnologías a utilizar durante el proyecto. El uso de estas tecnologías tiene como objetivo explotar el paralelismo que proporcionan los recursos de los equipos detallados en la sección \ref{RecursosHardware}.
+
+\section{El estándar de programación OpenACC}
+\label{OpenACC}
+OpenACC.org \cite{unknown-author-no-dateB} es una organización sin ánimo de lucro que cuenta con grandes empresas como Nvidia, AMD o Cray como miembros. El objetivo de esta organización es proporcionar el estándar de programación OpenACC.
+
+OpenACC ofrece a los desarrolladores una API soportada por C/C++ y Fortran, compatible con mútliples plataformas hardware. Siendo posible el uso de esta API tanto en procesadores Intel como AMD, incluso en tarjetas gráficas de Nvidia (aunque en este proyecto únicamente se utilizará para explotar el paralelismo a nivel de procesador).
+
+El funcionamiento de OpenACC consiste en definir mediante la API comentada anteriormente, los bucles o zonas del código en los que existe cierto nivel de paralelismo (esto es tarea del programador) y el compilador se encarga de añadir todas las operaciones necesarias para acelerar la región definida utilizando los distintos núcleos del procesador.
+
+Existen mútliples compiladores que soportan este estándar de programación, para este proyecto se ha utilizado pgc++ que viene incluido en el Nvidia HPC SDK \cite{unknown-author-2021D}.
+
+Para este proyecto se ha utilizado la siguiente especificación de OpenACC \cite{unknown-author-2019}.
+
+
+\section{La plataforma de programación paralela CUDA}
+
+CUDA, \textit{(Compute Unified Device Architecture)} es una plataforma de programación paralela desarrollada por Nvidia. Permite al programador aprovechar la computación de propósito general en unidades de procesamiento gráfico (GPGPU) para acelerar el código desarrollado. \cite{unknown-author-2021E}.
+
+Puede ser utilizado junto a varios lenguajes de programación distintos, pero el lenguaje de programación utilizado para el desarrollo de los kernels de CUDA es C (En CUDA, un kernel es una función que será ejecutada por tantas \textit{threads} como lancemos).
+
+Para el uso de CUDA, Nvidia nos proporciona lo que se conoce como CUDA Toolkit. Se trata de un kit que incorpora una serie de herramientas que ayudan al desarrollador en la tarea del desarrollo. Algunas de estas herramientas son:
+
+\begin{itemize}
+    \item CUDA NVCC: El compilador utilizado para los archivos con extensión .cu (archivos CUDA).
+    \item Una serie de librerías muy utilizadas en la programación CUDA, como lo son cudart, cuRAND, cuSOLVER, cuSPARSE \dots
+    \item CUDA GDB: Un depurador compatible con programas CUDA.
+    \item CUDA Memcheck: Una herramienta que es capaz de detectar errores de memoria como accesos a posiciones fuera de los límites en programas CUDA
+    \item cuobjdump: Permite obtener información sobre los archivos binarios resultado de la compilación con NVCC.
+    \item nvprof: Una herramienta de profiling que permite realizar una monitorización del ejecutable para conocer en que zonas del código se está consumiendo más tiempo.
+    \item pgc++: El compilador utilizado para OpenACC que hemos comentado en la sección \ref{OpenACC}.
+\end{itemize}
+
+Para el desarrollo de éste proyecto se ha utilizado la versión 11.2 del CUDA Toolkit \cite{unknown-author-2021F}.
+
+\section{OpenACC vs CUDA}
+
+Una vez introducidas las tecnologías que van a ser utilizadas en este proyecto se deja esta sección a modo de comparativa entre OpenACC y CUDA.
+
+OpenACC es una tecnología sencilla de utilizar, ya que sobre el código secuencial escrito en C++ se añaden las directivas necesarias para explotar el paralelismo a nivel de bucle. Esto quiere decir, que no es necesaria utilizar una metodología para la programación distinta a la que se ha utilizado para el código secuencial.
+
+CUDA es una tecnología algo más compleja, ya que si requiere el estudio de conceptos como lo son los kernels, blocks, threads, grid \dots Además, requiere cambiar el código secuencial inicial para utilizar la API de CUDA para operaciones como la reserva de memoria. Por otro lado, no es posible el uso de los vectores de la STL utilizados en la versión secuencial, sino que es necesaria la gestión de la memoria a través de punteros. Finalmente, por limitaciones de CUDA, no es posible la gestión de arrays multinivel sin el uso de librerías externas, por lo que es necesaria la linealización de las estructuras de datos.
+
+Pese a que CUDA presente más complejidad, los beneficios que nos proporciona el uso del paradigma GPGPU son sustancialmente superiores a los que nos proporciona OpenACC. Aunque es necesario recalcar que CUDA requiere la transferencia de las estructuras de datos a la tarjeta gráfica, por lo que la estructura de datos a analizar debe tener un tamaño considerable para que el tiempo de la transferencia a la tarjeta gráfica se contrareste con los beneficios computacionales que nos proporciona la GPU.
