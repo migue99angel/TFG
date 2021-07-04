@@ -1,0 +1,217 @@
+\chapter{Paralelización con CUDA}
+
+En este capítulo se va a describir la paralelización realizada con la plataforma de programación CUDA, introducida en la sección \ref{CUDA}. Como se anticipaba en la comparativa de la sección \ref{comparativa}, CUDA es, objetivamente, una tecnología más compleja, ya que para aplicarla es necesario estudiar una serie de conceptos como \textit{kernel, thread, block, grid, thread per block \dots }. 
+
+\section{Funcionamiento de CUDA}
+\label{FuncionamientoCUDA}
+Para la implementación de una versión con CUDA, es necesario saber el funcionamiento de esta plataforma de programación. En primer lugar, debemos reservar memoria principal para el almacenamiento de la estructura de datos que se va a procesar. Una vez tengamos la estructura de datos correctamente alojada en memoria, es el momento de la transferencia CPU-GPU, es decir, se transfiere la estructura de datos a la tarjeta gráfica. La transferencia de la estructura de datos es un proceso costoso, y es el \textit{precio a pagar} por utilizar la programación GPU. Por tanto, tenemos que asegurarnos que las dimensiones de la estructura de datos son suficientemente grandes para que sea rentable consumir ese tiempo en la transferencia, ya que si la estructura de datos es de un tamaño considerable aunque se consuma tiempo de transferencia de datos, este se verá compensando por la aceleración que proporciona el uso de la arquitectura SIMD (\textit{"Single Instruction Multiple Data"}) en este tipo de operaciones.
+
+Una vez tengamos la estructura de datos en la tarjeta gráfica es el momento de procesarla. Tendremos que programar un \textit{kernel}, podemos ver un \textit{kernel} de CUDA como una función ejecutada en la tarjeta gráfica. Se lanzarán tantos \textit{kernels} como \textit{threads} hayamos lanzado. Las \textit{threads} se lanzarán por grupos, estos grupos son llamados \textit{blocks} y a su vez estos \textit{blocks} pueden ser lanzados en grupos llamados \textit{grids}.
+
+Como ya hemos comentado, las \textit{threads} se lanzan por grupos llamados \textit{blocks}, de aquí aparece un nuevo concepto, el llamado \textit{thread per block}, es decir, el número de \textit{threads} que hay en cada \textit{block}, queda como tarea del programador establecer este parámetro. Es importante saber que las tarjetas gráficas de Nvidia cuentan con \textit{warps} (unidades de ejecución) de 32 \textit{threads} ver \cite{unknown-author-2021G}, por tanto por motivos de eficiencia se tomarán valores de \textit{thread per block} mútliplos de 32, teniendo como límite en las tarjetas gráficas actuales 1024. 
+
+\section{Aplicando CUDA al Box counting}
+
+En esta sección se va a comentar el código CUDA desarrollado como primera versión, este código puede ser consultado en Listado \ref{CUDABox2D}.
+
+\begin{lstlisting}[language=C++,caption={Primera versión del Boxcount2D paralelizado con CUDA},label=CUDABox2D,basicstyle=\tiny]
+    float boxcount2D(unsigned char* matriz, int* n, int* r, int width, long p, int TPB)
+    {
+        unsigned char* device_matrix;
+        int *device_sum =  0;
+        int host_sum  = 0;
+    
+        //Se reserva memoria en la GPU para la matriz y para la variable suma
+        cudaMalloc((void**) &device_matrix,sizeof(unsigned char)*width*width);
+        cudaMalloc((void**) &device_sum, sizeof(int));
+    
+        //Se crean los eventos de CUDA para medir el tiempo de $\textcolor{ao(english)}{ejecución}$ del Boxcount
+        cudaEvent_t start, stop;
+        
+        cudaEventCreate(&start) ;
+        cudaEventCreate(&stop) ;
+        cudaEventRecord(start, 0 );
+    
+        //Se realiza la transferencia CPU - GPU
+        cudaMemcpy(device_matrix,matriz,sizeof(unsigned char)*width*width,cudaMemcpyHostToDevice);
+        
+        //Se inicializa el valor de la variable suma residente en la GPU a 0
+        cudaMemcpy(device_sum,&host_sum,sizeof(int),cudaMemcpyHostToDevice);
+    
+        int zero = 0;
+        int iter = 0;
+    
+        float time = 0;
+    
+        for(auto g = p; g >= 0; g--)
+        {
+            //siz es el valor de r, es decir el ancho del box
+            int siz = pow(2,(p-g));
+
+            //siz2 es utilizada para localizar el resultado de la $\textcolor{ao(english)}{operación}$ 
+            // OR del r de la anterior $\textcolor{ao(english)}{iteración}$
+            int siz2 = round(siz/2);
+
+
+
+            //Esta $\textcolor{ao(english)}{función}$ es una barrera, que obliga a esperar a que todo el trabajo 
+            //realizado en la GPU $\textcolor{ao(english)}{esté}$ terminado.
+            cudaDeviceSynchronize();
+    
+            //Se llama a una $\textcolor{ao(english)}{función}$, que calcula el $\textcolor{ao(english)}{número}$ de hebras a lanzar para cada $\textcolor{ao(english)}{tamaño}$ de siz 
+            int threadsToLaunch = calculoThreads2D(width,siz);
+            int blockToLaunch = 1;
+    
+            //Se calcula el $\textcolor{ao(english)}{número}$ de bloques a lanzar en $\textcolor{ao(english)}{función}$ de las threads por bloque 
+            // y las threads totales a lanzar 
+            if(threadsToLaunch > TPB)
+            {
+                if(threadsToLaunch%TPB == 0)
+                    blockToLaunch = threadsToLaunch/TPB;
+                else
+                    blockToLaunch = (threadsToLaunch/TPB) + 1;
+            }
+            else if(threadsToLaunch < TPB)
+                TPB = threadsToLaunch;
+
+            //Kernel encargado de realizar el $\textcolor{ao(english)}{cálculo}$ de los boxes.
+            //Se lanza con blockToLaunch bloques y TPB hebras por bloque 
+            boxcount2D<<<blockToLaunch,TPB>>>(device_matrix,width,siz2,siz,threadsToLaunch);
+    
+            ///Barrera para esperar a que termine todo el trabajo de la GPU
+            cudaDeviceSynchronize();
+    
+            //Kernel encargado de realizar el recuento de boxes $\textcolor{ao(english)}{válidos}$
+            //Se lanza con blockToLaunch bloques y TPB hebras por bloque 
+            add_matrix2D_values<<<blockToLaunch,TPB>>>(device_matrix, device_sum,width,siz,threadsToLaunch);
+            
+            //Barrera para esperar a que termine todo el trabajo de la GPU
+            cudaDeviceSynchronize();
+
+            //Transferencia GPU - CPU para recuperar el valor de la variable suma calculado
+            cudaMemcpy(&host_sum,device_sum,sizeof(int),cudaMemcpyDeviceToHost);
+
+            //Almacenamos el valor de N calculado para el $\textcolor{ao(english)}{tamañi}$ r
+            n[iter] = host_sum;
+            iter++;
+    
+            //Volvemos a inicializar la variable suma de la GPU a 0, para la siguiente $\textcolor{ao(english)}{iteración}$
+            cudaMemcpy(device_sum,&zero,sizeof(int),cudaMemcpyHostToDevice);
+    
+            cudaDeviceSynchronize();
+    
+    
+        }
+    
+        //Se para el evento y se mide el tiempo utilizado
+        cudaEventRecord(stop, 0) ;
+        cudaEventSynchronize(stop) ;
+        cudaEventElapsedTime(&time, start, stop );
+    
+        //Se almacena en una lista los $\textcolor{ao(english)}{tamaños}$ de caja que se han utilizado
+        for(auto o = 0; o <= p; o++)
+            r[o] = pow(2,o); 
+
+        //Se libera memoria de la GPU
+        cudaFree(device_matrix);
+        cudaFree(device_sum);
+    
+
+        //Antes de terminar la $\textcolor{ao(english)}{función}$ esperamos que la memoria haya sido correctamente liberada
+        cudaDeviceSynchronize();
+    
+        //Se devuelve el tiempo tardado para la $\textcolor{ao(english)}{realización}$ del experimento
+        return time;
+    
+    
+    }
+\end{lstlisting}
+
+El código del Listado \ref{CUDABox2D} tiene como variables de entrada:
+
+\begin{itemize}
+    \item \textit{matriz}: La estructura de datos a analizar.
+    \item \textit{n}: Lista en la que se almacena la cantidad de boxes válidos para cada tamaño del box.
+    \item \textit{r}: Lista con los tamaños de box utilizados.
+    \item \textit{width}: Tamaño de cada diemnsión de la matriz (como son cuadradas todas las dimensiones tienen el mismo valor).
+    \item \textit{p}: Representa el número de iteraciones necesarias para cubrir la matriz entera, teniendo en cuenta que cada iteración aumenta el tamaño de la caja en una potencia de dos.
+\end{itemize}
+
+Como la estructura de datos que se pasa como parámetro ya se encuentra alojada en memoria principal, el primer paso es reservar espacio en la GPU para el alojamiento de la estructura de datos, esto es lo que se hace en las líneas 8 - 9 del Listado \ref{CUDABox2D}. En las líneas 19 y 22 se hacen las transferencias de datos CPU - GPU, como ya anticipabamos en \ref{FuncionamientoCUDA}, estas transferencias son muy costosas y es una de las limitaciones que tiene CUDA, por esta razón se coloca el cálculo del instante inicial (líneas 14 - 16) antes de realizar las transferencias, ya que para ser justos en las comparaciones tenemos que tener en cuenta ese tiempo.
+Tal y como se comenta en la sección \ref{FuncionamientoCUDA}, queda como tarea del programador la elección del \textit{thread per block} (TPB), para la realización de los experimentos se han lanzado todos los TPB posibles (múltiplos de 32 hasta 1024). Sin embargo, el TPB influye no solo en la eficiencia de las operaciones, si no en la ejecución del algoritmo ya que para lanzar un kernel es necesario especificar los bloques que se lanzarán. Para ello enntre las líneas 45-59 se realiza el cálculo de los bloques a lanzar en función del TPB elegido (objetivamente, esto no era necesario hacerlo con OpenACC ni en la versión secuencial).
+
+Una vez se ha realizado el trabajo previo, es el momento de lanzar los kernels. El primer kernel llamado \textit{boxcount2D}, se encuentra en el Listado \ref{kernel1} es el encargado de realizar el cálculo de los distintos box. Sus variables de entrada son:
+\begin{itemize}
+    \item \textit{matriz}: La estructura de datos a analizar.
+    \item \textit{column}: Tamaño de cada diemnsión de la matriz (como son cuadradas todas las dimensiones tienen el mismo valor).
+    \item \textit{param}:  Es utilizada para localizar el resultado de la operación OR del r de la anterior iteración. Es siz2 en el Listado \ref{CUDABox2D}.
+    \item \textit{siz}: Es el valor de r, es decir el ancho del box.
+    \item \textit{threadsToLaunch}: El número total de threads a lanzar.
+\end{itemize}
+
+Aunque las threads se lancen en bloques de tamaño TPB, mediante el uso de las variables \textit{threadIdx, blockDim.x y blockIdx.x} que nos proporciona CUDA (cada thread tiene sus propios identificadores de hebra y bloque), es posible calcular la posición concreta a la que tiene que acceder cada thread. Para ello se calcula el identificador global y la variable \textit{var}, con estos datos realizando los cálculos de las líneas 15 y 16 es posible obtener la posición de la matriz cuyo box se tiene que calcular.
+
+\newpage
+\begin{lstlisting}[language=C++,caption={Kernel boxcount2D},label=kernel1]
+
+
+__global__ void boxcount2D(unsigned char* matrix, int column, int param, int siz, int threadsToLaunch)
+{
+
+    int threadId = threadIdx.x + blockDim.x * blockIdx.x;
+
+    if(threadId < threadsToLaunch)
+    {
+        //Se calcula la variable var que es 
+        // utilizada para indexar la matriz
+        int var = column/siz;
+
+        int i_matrix = (threadId/var)*siz;
+        int j_matrix = (threadId%var)*siz;
+
+    
+        int i = i_matrix*(column) + j_matrix;
+
+
+        matrix[i] = (  matrix[i] 
+                    || matrix[i+param] 
+                    || matrix[i + param*column] 
+                    || matrix[i+param + param*column]);
+        
+    }
+ 
+    
+}
+    
+\end{lstlisting}
+
+El segundo kernel lanzado es el utilizado para realizar el recuento de los boxes válidos. Las variables de entrada son las mismas que para el kernel del Listado \ref{kernel1} con la incorporación de la variable \textit{sum}.
+\newpage
+\begin{lstlisting}[language=C++,caption={Kernel para la acumulación de boxes válidos},label=kernel2]
+
+
+    __global__ void add_matrix2D_values(unsigned char* matrix, int *sum, int column, int siz, int threadsToLaunch)
+    {
+    
+        int threadId = threadIdx.x + blockDim.x * blockIdx.x;
+    
+        if(threadId < threadsToLaunch)
+        {
+            int var = column/siz;
+    
+            int i_matrix = (threadId/var)*siz;
+            int j_matrix = (threadId%var)*siz;
+    
+            int i = i_matrix*(column) + j_matrix;
+        
+            atomicAdd(sum, matrix[i]);
+        }
+            
+    
+    }
+        
+\end{lstlisting}
+
+En el Listado \ref{kernel2}, la parte de la indexación de la matriz es idéntica a la usada en el \ref{kernel1}. Pero se presenta una incorporación y es que de igual manera que ocurre en la sección \ref{ParalelizacionOpenACC}, aparece el problema de la condición de carrera. Todas las threads que se lancen a ejecutar el kernel intentan leer y escribir en la variable \textit{sum}. Para solucionar esto se utiliza la función \textit{atomicAdd} ver \cite{unknown-author-2021H}.
+
+La función \textit{atomicAdd} nos permite asegurarnos de que el acceso a la variable \textit{sum} se realiza bajo las condiciones de \textbf{exclusión mútua}, de manera que evitamos el riesgo de que al final de la ejecución, dicha variable acabe con un valor erróneo.

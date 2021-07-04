@@ -6,7 +6,7 @@ Tras el estudio teórico del algoritmo a implementar, se deja este capítulo par
 \label{OpenACC}
 OpenACC.org \cite{unknown-author-no-dateB} es una organización sin ánimo de lucro que cuenta con grandes empresas como Nvidia, AMD o Cray como miembros. El objetivo de esta organización es proporcionar el estándar de programación OpenACC.
 
-OpenACC ofrece a los desarrolladores una API soportada por C/C++ y Fortran, compatible con mútliples plataformas hardware. Siendo posible el uso de esta API tanto en procesadores Intel como AMD, incluso en tarjetas gráficas de Nvidia (aunque en este proyecto únicamente se utilizará para explotar el paralelismo a nivel de procesador).
+OpenACC ofrece a los desarrolladores una API soportada por C/C++ y Fortran, compatible con mútliples plataformas hardware. Siendo posible el uso de esta API tanto en procesadores Intel como AMD, incluso en tarjetas gráficas de Nvidia (aunque en este proyecto únicamente se utilizará para explotar el paralelismo a nivel de CPU).
 
 El funcionamiento de OpenACC consiste en definir mediante la API comentada anteriormente, los bucles o zonas del código en los que existe cierto nivel de paralelismo (esto es tarea del programador) y el compilador se encarga de añadir todas las operaciones necesarias para acelerar la región definida utilizando los distintos núcleos del procesador.
 
@@ -16,12 +16,13 @@ Para este proyecto se ha utilizado la siguiente especificación de OpenACC \cite
 
 
 \section{La plataforma de programación paralela CUDA}
+\label{CUDA}
 
 CUDA, \textit{(Compute Unified Device Architecture)} es una plataforma de programación paralela desarrollada por Nvidia. Permite al programador aprovechar la computación de propósito general en unidades de procesamiento gráfico (GPGPU) para acelerar el código desarrollado. \cite{unknown-author-2021E}.
 
 Puede ser utilizado junto a varios lenguajes de programación distintos, pero el lenguaje de programación utilizado para el desarrollo de los kernels de CUDA es C (En CUDA, un kernel es una función que será ejecutada por tantas \textit{threads} como lancemos).
 
-Para el uso de CUDA, Nvidia nos proporciona lo que se conoce como CUDA Toolkit. Se trata de un kit que incorpora una serie de herramientas que ayudan al desarrollador en la tarea del desarrollo. Algunas de estas herramientas son:
+Para el uso de CUDA, Nvidia nos proporciona lo que se conoce como CUDA Toolkit. Se trata de un kit que incorpora una serie de herramientas que ayudan al desarrollador en la tarea de implementación. Algunas de estas herramientas son:
 
 \begin{itemize}
     \item CUDA NVCC: El compilador utilizado para los archivos con extensión .cu (archivos CUDA).
@@ -36,6 +37,7 @@ Para el uso de CUDA, Nvidia nos proporciona lo que se conoce como CUDA Toolkit. 
 Para el desarrollo de éste proyecto se ha utilizado la versión 11.2 del CUDA Toolkit \cite{unknown-author-2021F}.
 
 \section{OpenACC vs CUDA}
+\label{comparativa}
 
 Una vez introducidas las tecnologías que van a ser utilizadas en este proyecto se deja esta sección a modo de comparativa entre OpenACC y CUDA.
 
