@@ -1,1 +1,20 @@
 \chapter{Optimizaciones}
+
+En el capítulo \ref{Secuencial}, se ha presentado una implementación secuencial del algoritmo Box counting. Posteriormente en los capítulos \ref{ParalelizacionOpenACC} y \ref{ParalelizacionCUDA}, se detalla la paralelización del código secuencial mediante el uso de OpenACC y CUDA. A continuación, se deja este capítulo en el que se detallarán diversas modificaciones a realizar a los códigos previamente mencionados, con el objetivo de reducir su tiempo de ejecución. 
+
+Para el desarrollo de este apartado se distinguen entre tres variaciones del código. Se toman los tiempos del código sin modificar y después se toman los tiempos de estas tres variaciones de forma independiente. De esta manera, podemos detectar si la variación que estamos introduciendo realmente mejora los tiempos o si en caso contrario esta originando una pérdida de rendimiento. \\
+
+La versión final con la que nos quedaremos para cada implementación, será aquella que nos proporcione mejores tiempos, para así poder realizar las comparaciones de la manera más justa posible.
+
+\section{Unificación de bucles}
+Si analizamos el código del Listado \ref{CppBox2D}, apreciamos que entre los dos bloques de bucles for anidados, correspondientes a las líneas 5-10 y 13-15, se recorre la estructura de datos de igual manera. Por tanto sería posible la unificación de ambos bloques de bucles en un bloque. De este modo, no solo nos ahorramos el coste de recorrer la estructura en dos ocasiones, sino que se puede aprovechar el principio de localidad, lo que teóricamente propiciaría que ocurrieran menos \textit{fallos de caché} y por tanto se redujera el tiempo de ejecución.
+\section{Optimización de operaciones}
+Es fácil ver en el código del Listado \ref{CppBox4D}, una serie de operaciones que se repiten varias veces, concretamente la suma de los diversos índices con los que se accede a la estructura de datos con la variable \textit{siz2}. Se plantea el cálculo previo de esas operaciones con el objetivo de reducir el número de operaciones realizadas.
+
+En el caso de CUDA podemos ir un poco más lejos. Ademas de precalcular las mismas variables que en el apartado secuencial, se pueden optimizar las operaciones realizadas para calcular el índice al que tiene que acceder cada thread. Si analizamos el Listado \ref{kernel1}, observamos que en las líneas 12-18 se realizan múltiples operaciones, entre las que se incluyen divisiones y el cálculo del operador módulo que son de las operaciones que más coste computacional tienen. Se puede aprovechar que se trabaja con matrices cuadradas y que la gran mayoría de parámetros utilizados en esas operaciones son múltiplos de dos, para sustiur esas operaciones por desplazamientos a nivel de bits, que tienen un coste computacional considerablemente menor.
+
+\section{Pinned Memory}
+
+Como se comenta previamente en el Capítulo \ref{ParalelizacionCUDA}, el uso de CUDA implica la transferencia CPU-GPU y esto es un proceso muy costoso. Por defecto, cuando un programa reserva memoria (Memoria RAM), esta se trata de memoria paginada, la cual no puede ser transferida a la tarjeta gráfica de manera directa, sino que hay que realizar un paso previo. 
+
+Lo que se propone en esta sección es el uso de la \textit{Pinned Memory} \cite{unknown-author-2020}, es decir, especificarle a la CPU que reserve la memoria para la estructura de datos en un "formato"  que sea directamente transferible a la GPU.

@@ -1,2 +1,25 @@
 \chapter{Resultados}
-
+\begin{table}[H]
+    \centering
+    \begin{adjustbox}{max height=\textheight,max width=\textwidth}
+    \begin{tabular}{|ccccccccc|} 
+    \hline
+    \rowcolor{white} \multicolumn{1}{|l}{size}  & \multicolumn{2}{c}{Secuencial}      & \multicolumn{2}{c}{OpenACC}  & \multicolumn{2}{c}{CUDA}  \\  
+    \hline
+    \rowcolor{white} \multicolumn{1}{|l}{}   & \textcolor{black}{PC}         & \textcolor{black}{Servidor} & \textcolor{black}{PC}         & \textcolor{black}{Servidor} & \textcolor{black}{PC}         & \textcolor{black}{Servidor} \\  
+    \hline   
+    \rowcolor{white} \multicolumn{1}{|l}{$128^2$}   &0,000129244   &0,00048 &0,000131645&0,00741 & 0,000215194 &0,000188416&\\
+    \hline
+    \rowcolor{white} \multicolumn{1}{|l}{$1024^2$}   &0,008266200    &0,01075 &0,002640920 &0,00303 & 0,000654080 &0,000403968&\\
+    \hline
+    \rowcolor{white} \multicolumn{1}{|l}{$4096^2$}   &0,134949   &0,15189 &0,0328057 &0,02203 &0,00590357 &0,0027392&\\
+    \hline
+    \rowcolor{white} \multicolumn{1}{|l}{$8192^2$}   &0,554647  &0,60966 &0,128613 &0,04978 &0,0226653 &0,0099031&\\
+    \hline
+    \rowcolor{white} \multicolumn{1}{|l}{$16384^2$}   &1,80975  &2,44145 &0,419469 &0,15529 &0,0931673 &0,0403067&\\
+    \hline
+    \end{tabular}
+    \end{adjustbox}
+    \caption{Tabla comparativa de las plataformas hardware y software utilizadas para las medidas de tiempos}
+    \label{fig:Resultados2D}
+\end{table}

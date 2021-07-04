@@ -1,4 +1,5 @@
 \chapter{Paralelización con CUDA}
+\label{ParalelizacionCUDA}
 
 En este capítulo se va a describir la paralelización realizada con la plataforma de programación CUDA, introducida en la sección \ref{CUDA}. Como se anticipaba en la comparativa de la sección \ref{comparativa}, CUDA es, objetivamente, una tecnología más compleja, ya que para aplicarla es necesario estudiar una serie de conceptos como \textit{kernel, thread, block, grid, thread per block \dots }. 
 
@@ -214,4 +215,4 @@ El segundo kernel lanzado es el utilizado para realizar el recuento de los boxes
 
 En el Listado \ref{kernel2}, la parte de la indexación de la matriz es idéntica a la usada en el \ref{kernel1}. Pero se presenta una incorporación y es que de igual manera que ocurre en la sección \ref{ParalelizacionOpenACC}, aparece el problema de la condición de carrera. Todas las threads que se lancen a ejecutar el kernel intentan leer y escribir en la variable \textit{sum}. Para solucionar esto se utiliza la función \textit{atomicAdd} ver \cite{unknown-author-2021H}.
 
-La función \textit{atomicAdd} nos permite asegurarnos de que el acceso a la variable \textit{sum} se realiza bajo las condiciones de \textbf{exclusión mútua}, de manera que evitamos el riesgo de que al final de la ejecución, dicha variable acabe con un valor erróneo.
+La función \textit{atomicAdd} nos permite asegurarnos de que el acceso a la variable \textit{sum} se realiza bajo las condiciones de \textbf{exclusión mutua}, de manera que evitamos el riesgo de que al final de la ejecución, dicha variable acabe con un valor erróneo.
