@@ -6,15 +6,300 @@ Para el desarrollo de este apartado se distinguen entre tres variaciones del có
 
 La versión final con la que nos quedaremos para cada implementación, será aquella que nos proporcione mejores tiempos, para así poder realizar las comparaciones de la manera más justa posible.
 
+Para comparar las distintas versiones en este capítulo se utilizan las aceleraciones con respecto a la versión secuencial obtenida en la plataforma llamada "PC" en la tabla \ref{fig:Hardware}
+
 \section{Unificación de bucles}
 Si analizamos el código del Listado \ref{CppBox2D}, apreciamos que entre los dos bloques de bucles for anidados, correspondientes a las líneas 5-10 y 13-15, se recorre la estructura de datos de igual manera. Por tanto sería posible la unificación de ambos bloques de bucles en un bloque. De este modo, no solo nos ahorramos el coste de recorrer la estructura en dos ocasiones, sino que se puede aprovechar el principio de localidad, lo que teóricamente propiciaría que ocurrieran menos \textit{fallos de caché} y por tanto se redujera el tiempo de ejecución.
+
+\subsection{Aplicación a la versión secuencial y OpenACC}
+El código de la aplicación de esta optimización tanto a la versión secuencial, como a la versión paralelizada con OpenACC, es la que se puede ver en el Listado \ref{UnificacionSecuencialOpenACC}.
+
+\begin{lstlisting}[language=C++,caption={Optimización de unificación de bucles aplicada al Boxcount2D tanto en su versión secuencial como en su versión con OpenACC},label=UnificacionSecuencialOpenACC]
+    for(auto g=p; g >= 0; g--)
+    {
+        int siz = pow(2,(p-g));
+        int siz2 = round(siz/2);
+        int suma = 0;
+        #if PARALLEL == 1
+            #pragma acc parallel loop independent reduction(+:suma)
+        #endif
+        for(auto i = 0; i <= (width-siz); i += siz)
+        {
+            for(auto j = 0; j <= (width-siz); j += siz)
+            {
+                matriz[i][j] = (matriz[i][j] 
+                                || matriz[i + siz2][j] 
+                                || matriz[i][j + siz2] 
+                                || matriz[i + siz2][j + siz2]);
+
+                suma += matriz[i][j];
+            }
+        }
+
+        n.push_back(suma);
+    }
+\end{lstlisting}
+\newpage
+\subsection{Aplicación a la versión CUDA}
+Por otro lado en CUDA, el kernel resultante es el que se muestra en el Listado \ref{UnificacionCUDA}. 
+
+\begin{lstlisting}[language=C++,caption={Optimización de unificación de bucles aplicada al Boxcount2D CUDA},label=UnificacionCUDA]
+    __global__ void boxcount2D(unsigned char* matrix, int column, int param, int siz, int threadsToLaunch, int *sum)
+    {
+        int threadId = threadIdx.x + blockDim.x * blockIdx.x;
+        if(threadId < threadsToLaunch)
+        {
+            //$\textcolor{ao(english)}{Cálculo}$ del Box
+            int var = column/siz;
+            int i_matrix = (threadId/var)*siz;
+            int j_matrix = (threadId%var)*siz;
+            int i = i_matrix*(column) + j_matrix;
+            matrix[i] = (  matrix[i] 
+                        || matrix[i+param] 
+                        || matrix[i + param*column] 
+                        || matrix[i+param + param*column]);
+            
+            //$\textcolor{ao(english)}{Acumulación}$ del $\textcolor{ao(english)}{número}$ de boxes 
+            atomicAdd(sum, matrix[i]);            
+        }   
+    }
+\end{lstlisting}
+
+\subsection{Resultados}
+En la Tabla \ref{MejorasUnificacionBuclesOpenACC} se ven las aceleraciones para OpenACC con esta modificación y sin ella. Como para todas las versiones se han obtenido mejoras significativas esta modificación se incorporará a la versión final.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lll}
+    Tamaños & \begin{tabular}[c]{@{}l@{}}Aceleraciones con \\Unificacion de bucles \\OpenACC\end{tabular} & \begin{tabular}[c]{@{}l@{}}Aceleraciones sin \\Optimizaciones \\OpenACC\end{tabular}  \\
+    $1024^2$   & 2,984149724                                                                                 & 3,57728057                                                                           \\
+    $4096^2$   & 4,487524996                                                                               & 3,911123095                                                                        \\
+    $8192^2$   & 4,408322753                                                                                 & 3,492839559                                                                           \\
+    $16384^2$   & 4,295114421                                                                                & 3,809601452                                                                           \\
+        &                                                                                             &                                                                                       \\
+    $64^3$   & 4.312610381                                                                                 & 3.70817685                                                                            \\
+    $128^3$   & 4.057022873                                                                                 & 4.012010852                                                                           \\
+    $256^3$   & 4.444990991                                                                                 & 3.517780319                                                                           \\
+    $512^3$   & 4.148531678                                                                                 & 4.050919798                                                                           \\
+       &                                                                                             &                                                                                       \\
+    $32^4$   & 4.186592765                                                                                 & 3.802352926                                                                           \\
+    $64^4$   & 4.116879344                                                                                 & 3.97023263                                                                            \\
+    $128^4$   & 4.131479348                                                                                 & 3.7214099                                                                            
+    \end{tabular}
+    \caption{Tabla comparativa de las mejoras obtenidas con la unificación de bucles para OpenACC}
+    \label{MejorasUnificacionBuclesOpenACC}
+\end{table}
+De igual manera sucede con CUDA, en la tabla \ref{MejorasUnificacionBuclesCUDA} se pueden observar la mejora en las aceleraciones.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lll}
+    Tamaños & \begin{tabular}[c]{@{}l@{}}Aceleraciones Unificación \\de kernels CUDA\end{tabular} & Aceleraciones Sin Optimizar  \\
+    $1024^2 $   & 12,41949225                                                                         & 8,404528114                  \\
+    $4096^2 $   & 19,54694921                                                                          & 14,3837787                 \\
+    $8192^2 $   & 19,87926957                                                                       & 14,76407171                  \\
+    $16384^2$   & 16,33702064                                                                        & 11,81535868                  \\
+       &                                                                                     &                              \\
+    $64^3   $   & 3.463814781                                                                         & 2,344035338                  \\
+    $128^3  $   & 2.713720304                                                                         & 1,99691276                 \\
+    $256^3  $   & 5.623619779                                                                         & 4,17658835                  \\
+    $512^3  $   & 11.24782616                                                                         & 8,134720736                 \\
+       &                                                                                     &                              \\
+    $32^4   $   & 8.469665156                                                                         & 7.267813454                  \\
+    $64^4   $   & 6.176071236                                                                         & 5.609168664                  \\
+    $128^4  $   & 4.153976131                                                                         & 3.852551076                 
+    \end{tabular}
+    \caption{Tabla comparativa de las mejoras obtenidas con la unificación de bucles para CUDA}
+    \label{MejorasUnificacionBuclesCUDA}
+    \end{table}
+
 \section{Optimización de operaciones}
 Es fácil ver en el código del Listado \ref{CppBox4D}, una serie de operaciones que se repiten varias veces, concretamente la suma de los diversos índices con los que se accede a la estructura de datos con la variable \textit{siz2}. Se plantea el cálculo previo de esas operaciones con el objetivo de reducir el número de operaciones realizadas.
 
 En el caso de CUDA podemos ir un poco más lejos. Ademas de precalcular las mismas variables que en el apartado secuencial, se pueden optimizar las operaciones realizadas para calcular el índice al que tiene que acceder cada thread. Si analizamos el Listado \ref{kernel1}, observamos que en las líneas 12-18 se realizan múltiples operaciones, entre las que se incluyen divisiones y el cálculo del operador módulo que son de las operaciones que más coste computacional tienen. Se puede aprovechar que se trabaja con matrices cuadradas y que la gran mayoría de parámetros utilizados en esas operaciones son múltiplos de dos, para sustiur esas operaciones por desplazamientos a nivel de bits, que tienen un coste computacional considerablemente menor.
+
+\subsection{Aplicación a la versión secuencial y OpenACC}
+
+El código de la aplicación de esta optimización tanto a la versión secuencial, como a la versión paralelizada con OpenACC, es la que se puede ver en el Listado \ref{OperacionesSecuencialOpenACC}.
+
+\begin{lstlisting}[language=C++,caption={Optimización de operaciones aplicada al Boxcount2D tanto en su versión secuencial como en su versión con OpenACC},label=OperacionesSecuencialOpenACC]
+    for(auto g=p; g >= 0; g--)
+    {
+        int siz = pow(2,(p-g));
+        int siz2 = round(siz/2);
+        int suma = 0;
+
+        #if PARALLEL == 1
+            #pragma acc parallel loop 
+        #endif
+        for(auto i = 0; i <= (width-siz); i += siz)
+        {
+            int i_boxed = i + siz2;
+            for(auto j = 0; j <= (width-siz); j += siz)
+            {
+                int j_boxed = j + siz2;
+                matriz[i][j] = (matriz[i][j] 
+                                || matriz[i_boxed][j] 
+                                || matriz[i][j_boxed] 
+                                || matriz[i_boxed][j_boxed]);
+            }
+        }
+
+        int suma = 0; 
+        #if PARALLEL == 1
+            #pragma acc parallel loop independent reduction(+:suma)
+        #endif
+        for(auto i = 0; i <= (width-siz); i += siz)
+            for(auto j = 0; j <= (width-siz); j += siz)
+            suma += matriz[i][j];
+
+        n.push_back(suma);
+    }
+\end{lstlisting}
+
+\subsection{Aplicación a la versión CUDA}
+Por otro lado en CUDA, los kernel resultantes son los que se muestra en el Listado \ref{OperacionesCUDA}. 
+\begin{lstlisting}[language=C++,caption={Optimización de operaciones aplicada al Boxcount2D tanto en su versión CUDA},label=OperacionesCUDA]
+__global__ void boxcount2D(unsigned char* matrix, int bits_column, int param, int bits_var, int threadsToLaunch, int bits_siz)
+{
+    int threadId = threadIdx.x + blockDim.x * blockIdx.x;
+    if(threadId < threadsToLaunch)
+    {
+        int i_matrix = (threadId>>bits_var)<<bits_siz;
+        int j_matrix = (threadId - ((threadId>>bits_var) << bits_var) )<<bits_siz;
+        int i = (i_matrix<<bits_column) + j_matrix;
+        int param_column = (param<<bits_column);
+        int i_param = i + param;
+    
+        matrix[i] = (matrix[i] || matrix[i_param] || matrix[i + param_column] || matrix[i_param + param_column]);
+    } 
+}
+
+__global__ void add_matrix2D_values(unsigned char* matrix, int *sum, int bits_column, int bits_var, int threadsToLaunch, int bits_siz)
+{
+    int threadId = threadIdx.x + blockDim.x * blockIdx.x;
+    if(threadId < threadsToLaunch)
+    {
+        int i_matrix = (threadId>>bits_var)<<bits_siz;
+        int j_matrix = (threadId - ((threadId>>bits_var) << bits_var) )<<bits_siz;
+        int i = (i_matrix<<bits_column) + j_matrix;
+
+        atomicAdd(sum, matrix[i]);
+    }
+}
+\end{lstlisting}
+
+\subsection{Resultados}
+En la Tabla \ref{MejorasOptimizacionOperacionesOpenACC} se muestran las aceleraciones obtenidas con la optimización de las operaciones para las versiones OpenACC. En cuento a la versión 2D, como la aceleracion más alta se consigue sin esta modificación, no la consideramos para la versión final, sin embargo para las versiones 3D y 4D si obtenemos una aceleración máxima mayor por el uso de esta modificación, por la que se añadirá a la versión final. 
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lll}
+    Tamaños & \multicolumn{1}{c}{\begin{tabular}[c]{@{}l@{}}Aceleraciones con \\Optimización de Operaciones \\OpenACC\end{tabular}} & \multicolumn{1}{c}{\begin{tabular}[c]{@{}l@{}}Aceleraciones sin \\Optimizaciones OpenACC\end{tabular}}  \\
+    $1024^2$   & 3.115623289                                                                                       & 3,57728057                                                                        \\
+    $4096^2$   & 3.674422878                                                                                       & 3,911123095                                                                         \\
+    $8192^2$   & 3.599536687                                                                                       & 3,492839559                                                                         \\
+    $16384^2$   & 3.582105055                                                                                       & 3,809601452                                                                         \\
+            &                                                                                                   &                                                                                     \\
+    $64^3 $     & 3.061699811                                                                                       & 3.70817685                                                                          \\
+    $128^3$     & 3.858858948                                                                                       & 4.012010852                                                                         \\
+    $256^3$     & 3.738563668                                                                                       & 3.517780319                                                                         \\
+    $512^3$     & 4.138583882                                                                                       & 4.050919798                                                                         \\
+         &                                                                                                   &                                                                                     \\
+    $32^4 $     & 4.296814849                                                                                       & 3.802352926                                                                         \\
+    $64^4 $     & 4.156693382                                                                                       & 3.97023263                                                                          \\
+    $128^4$     & 3.85475141                                                                                        & 3.7214099                                                                                                                                                                       
+    \end{tabular}
+    \caption{Tabla comparativa de las mejoras obtenidas con la optimización de operaciones para OpenACC}
+\label{MejorasOptimizacionOperacionesOpenACC}
+\end{table}
+
+En la Tabla \ref{MejorasOptimizacionOperacionesCUDA}, se muestran las aceleraciones obtenidas con CUDA, tanto aplicando esta modificación como sin aplicarla. En este caso, todas las versiones obtienen mejoras, por lo que se añadirá esta modificación a la versión final.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lll}
+    Tamaños & \begin{tabular}[c]{@{}l@{}}Aceleraciones \\con Optimización de \\Operaciones CUDA\end{tabular} & \begin{tabular}[c]{@{}l@{}}Aceleraciones sin \\Optimizaciones CUDA\end{tabular}  \\
+    $1024^2$    & 10,0050763                                                                                    & 8,404528114                                                                     \\
+    $4096^2$    & 16,24429536                                                                                   & 14,3837787                                                                      \\
+    $8192^2$    & 18,88124052                                                                                    & 14,76407171                                                                      \\
+    $16384^2$   & 15,47920772                                                                                  & 11,81535868                                                                     \\
+         &                                                                                                &                                                                                  \\
+    $64^3 $     & 2.790430598                                                                                    & 2.344035338                                                                      \\
+    $128^3$     & 2.255209939                                                                                    & 1.99691276                                                                       \\
+    $256^3$     & 5.341288686                                                                                    & 4.17658835                                                                       \\
+    $512^3$     & 10.65723313                                                                                    & 8.134720736                                                                      \\
+                 &                                                                                                &                                                                                  \\
+    $32^4 $     & 7.279456461                                                                                    & 7.267813454                                                                      \\
+    $64^4 $     & 5.911793871                                                                                    & 5.609168664                                                                      \\
+    $128^4$     & 3.898796669                                                                                    & 3.852551076                                                                     
+    \end{tabular}
+    \caption{Tabla comparativa de las mejoras obtenidas con la optimización de operaciones para CUDA}
+    \label{MejorasOptimizacionOperacionesCUDA}
+    \end{table}
 
 \section{Pinned Memory}
 
 Como se comenta previamente en el Capítulo \ref{ParalelizacionCUDA}, el uso de CUDA implica la transferencia CPU-GPU y esto es un proceso muy costoso. Por defecto, cuando un programa reserva memoria (Memoria RAM), esta se trata de memoria paginada, la cual no puede ser transferida a la tarjeta gráfica de manera directa, sino que hay que realizar un paso previo. 
 
 Lo que se propone en esta sección es el uso de la \textit{Pinned Memory} \cite{unknown-author-2020}, es decir, especificarle a la CPU que reserve la memoria para la estructura de datos en un "formato"  que sea directamente transferible a la GPU.
+
+A nivel de código, la única modificación que requiere esta optimización es usar la función \textit{cudaMalloc} al reservar memoria para la estructura en vez de la tradicional función malloc. 
+
+Como en la versión secuencial y en la versión para OpenACC no hay transferencias CPU-GPU, esta optimización no es aplicable a dichas versiones.
+
+\subsection{Resultados}
+Los resultados obtenidos de esta mejora son los que se ven en las Tabla \ref{MejorasPinnedMemory}: 
+
+\begin{table}[H]
+        \centering
+        \begin{tabular}{lll}
+        Tamaños & Aceleraciones Pinned Memory & Aceleraciones Sin Optimizar  \\
+        $1024^2$   & 8,869361666                & 8,404528114                 \\
+        $4096^2$   & 15,41072448               & 14,3837787                  \\
+        $8192^2$   & 15,78652336                 & 14,76407171                  \\
+        $16384^2$   & 12,55025377                & 11,81535868                  \\
+           &                             &                              \\
+        $64^3$   & 2.473678104                 & 2,344035338                  \\
+        $128^3$   & 2.139484553                 & 1,99691276                  \\
+        $256^3$   & 4.465828318                 & 4,17658835                  \\
+        $512^3$   & 8.64068644                  & 8,134720736                  \\
+           &                             &                              \\
+        $32^4$   & 7.289842298                 & 7.267813454                  \\
+        $64^4$   & 5.581416487                 & 5.609168664                  \\
+        $128^4$   & 3.827175403                 & 3.852551076                 
+\end{tabular}
+\caption{Tabla comparativa de las mejoras obtenidas con el uso de la Pinned Memory}
+\label{MejorasPinnedMemory}
+\end{table}
+
+Para las versiones bidimensionales y tridimensionales si se obtiene mejoras con respecto a la versiones sin optimizar, por tanto se considera que para esas versiones el uso de la \textit{Pinned memory} es una mejora y se conserva para las versiones finales. Por otro lado, para la versión con cuatro dimensiones no se mejora tiempo en el PC con características limitadas, sin embargo en el Servidor si supone una gran mejora, por tanto se conserva en la versión final.
+
+
+\section{Resultados optimización de la versión secuencial}
+Para cuantificar la mejora del algoritmo secuencial se calculan las aceleraciones de las versiones modificadas con respecto a la versión sin modificar. En la tabla \ref{MejorasSecuencial} se pueden ver las aceleraciones obtenidas. Para las versiones 2D y 3D hay unanimidad de resultados, únicamente se mejora con la modificación relativa a la unificación de los bucles, por lo que son las únicas que se incorporarán a la versión final.
+
+En cuanto a la versión 4D, mejoran los tiempos ambas modificaciones, sin embargo al unificarlas se obtienen peores tiempos con respecto a la mejora de la unificación de bucles, por tanto en la versión final nos quedaremos con la modificación de unificación de bucles que es la que ofrece mejores aceleraciones.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lllll}
+          & Sin Optimizar & Unificacion & Operaciones & Todas        \\
+    $1024^2$ & 1             & 1.088468303 & 0.896346433 &              \\
+    $4096^2$ & 1             & 1.12202125  & 0.936704204 &              \\
+    $8192^2$ & 1             & 1.144378952 & 0.954222385 &              \\
+    $16384^2$ & 1             & 1.142357034 & 0.950018937 &              \\
+          &               &             &             &              \\
+          &               &             &             &              \\
+          &               &             &             &              \\
+    $64^3$   & 1             & 1.106695491 & 0.94765464  &              \\
+    $128^3$   & 1             & 1.139621792 & 0.978630807 &              \\
+    $256^3$   & 1             & 1.116922454 & 0.957634608 &              \\
+    $512^3$   & 1             & 1.120168322 & 0.962737684 &              \\
+          &               &             &             &              \\
+          &               &             &             &              \\
+    $32^4$   & 1             & 1.098344685 & 1.023656071 & 1.015734477  \\
+    $64^4$   & 1             & 1.114478498 & 1.021819304 & 1.076506428  \\
+    $128^4$   & 1             & 1.115784311 & 1.026805835 & 1.073314528 
+    \end{tabular}
+    \caption{Tabla comparativa de las mejoras obtenidas para la versión secuencial}
+    \label{MejorasSecuencial}
+\end{table}

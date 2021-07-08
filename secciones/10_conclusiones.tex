@@ -1,1 +1,11 @@
 \chapter{Conclusiones}
+
+Durante la realización de este proyecto se ha realizado un estudio detallado del algoritmo, explicando su funcionamiento y realizando un análisis de su eficiencia.
+
+Seguidamente se realiza una introducción a las tecnologías a aplicar, OpenACC para explotar el paralelismo a nivel de CPU y CUDA para aprovechar el paradigma GPGPU. En el mismo capítulo en el que se introducen sendas tecnologías se realiza una comparativa entre ellas en la conclusiones obtenidas son que CUDA debería ofrecer mejores aceleraciones.
+
+Después, se propone una implementación secuencial escrita en C++ que se usa como base para la aplicación de las tecnologías detalladas. En la versión OpenACC se detallan las directivas a utilizar y se plantea el problema y la solución del acceso a la variable en la que se acumulan los resultados en exclusión mutua.
+
+En la versión CUDA, se detallan todos los pasos seguidos para el envío de los datos a la tarjeta gráfica y la implementación de los kernels utilizados. Después de esto, se deja un capítulo dedicado a la optimizción de todas las versiones implementadas, proponiendo varias mejoras y probandolas de manera experimental.
+
+Finalmente, se deja un capítulo con todos los resultados obtenidos con las versiones finales. Los resultados obtenidos demuestran lo esperado, el uso del paradigma GPGPU para la paralelización ofrece mejores prestaciones que la paralelización a nivel de CPU. En el primer equipo, con prestaciones limitadas, la aceleración máxima que se obtiene usando OpenACC es de 4.89x la versión 4D mientras que con CUDA dicha versión obtiene una aceleración máxima de de 9.82x. En el servidor, que cuenta con prestaciones bastante superiores al equipo anteriormente comentado, la aceleración máxima que se obtiene con OpenACC para la versión 4D es de 16.33x, mientras que con CUDA se obtiene una aceleración de 77.47x. Las limitaciones del algoritmo desarrollado queda demostrada en la Tabla \ref{TiemposServidorTransferencias}, donde se ve que si no se tienen en cuenta las transferencias CPU-GPU-CPU se logra una aceleración máxima de 382.23x para la versión bidimensional y una de 239.83x para la versión 4D.
